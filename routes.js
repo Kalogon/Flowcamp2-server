@@ -48,6 +48,27 @@ router.post('/login', (req, res) => {
     
 });
 
+router.post('/view', (req, res) => {
+    console.log('who get in here post /phonebook');
+    let inputData;
+    req.on('data', (data) => {
+      inputData = JSON.parse(data);
+    });
+    
+    req.on('end', () => {
+        console.log(inputData);
+        User.findOne({userid:inputData.user_id},(err,user)=>{
+            console.log(user);
+            if(err) return err;
+        
+            res.write(JSON.stringify(user.friends));
+            res.end();
+        })
+
+    });
+    
+});
+
 router.post('/phonePost', (req, res) => {
     console.log('who get in here post /users');
     let inputData;
@@ -68,7 +89,34 @@ router.post('/phonePost', (req, res) => {
                     user.addFriend(inputData[0].user_id,inputData[i].friend_name,inputData[i].friend_number);
                 }        
             }
-            res.write(JSON.stringify(user.friends));
+            res.write(user.userid);
+            res.end();
+        })
+
+    });
+    
+});
+
+
+router.post('/addcontact', (req, res) => {
+    console.log('who get in here post /addcontact');
+    var inputData;
+    req.on('data', (data) => {
+      inputData = JSON.parse(data);
+    });
+    
+    req.on('end', () => {
+        console.log(inputData);
+        User.findOne({userid:inputData.user_id},(err,user)=>{
+            if(err) return err;
+            else if (user !=null){
+                user.addFriend(inputData.user_id,inputData.friend_name,inputData.friend_number);
+            }
+            else{
+                console.log("망함");
+            }
+            console.log(user);
+            res.write(user.userid);
             res.end();
         })
 
@@ -76,6 +124,8 @@ router.post('/phonePost', (req, res) => {
  
     
 });
+
+
 router.post('/imagePost', (req, res) => {
     console.log('who get in here post /image');
     let inputData;
